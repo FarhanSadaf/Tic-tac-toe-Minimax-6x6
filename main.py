@@ -3,8 +3,8 @@ import pygame
 from board import Board
 pygame.init()
 
-WIDTH = 400
-HEIGHT = 400
+WIDTH = 400-4
+HEIGHT = 400-4
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Tic Tac Toe')
 clock = pygame.time.Clock()
@@ -25,10 +25,11 @@ def game_over():
     winner, cells = Board.check_winner(board.board, playersigns)
     if winner != None:
         print(f'\nPlayer {winner} ({playersigns[winner]}) wins!\n')
-        board.draw_line(screen, cells[0], cells[2])
+        board.draw_line(screen, cells[0], cells[1])
+        board.draw_line(screen, cells[1], cells[2])
         board.draw(screen)
         pygame.display.update()
-        pygame.time.delay(1000)
+        pygame.time.delay(2000)
         board.clear()
         return True
 

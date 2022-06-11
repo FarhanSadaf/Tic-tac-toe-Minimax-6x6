@@ -90,6 +90,25 @@ class Board:
         '''
         self.board = [[' ' for _ in range(self.size)] for _ in range(self.size)]
 
+    @staticmethod
+    def _adjacent_cells(cell1, cell2):
+        '''
+        Returns True if adjacent in row, colomn, right-diagonal or left-diagonal
+        '''
+        if cell1[0] == cell2[0] and abs(cell1[1] - cell2[1]) == 1:  #row
+            return True
+        
+        elif abs(cell1[0] - cell2[0]) == 1 and cell1[1] == cell2[1]:    #column
+            return True
+        
+        elif abs(cell1[0] - cell2[0]) == 1 and abs(cell1[1] - cell2[1]) == 1:   #right-diagonal
+            return True
+        
+        if cell1[0] == cell2[0] and cell1[1] == cell2[1]:   #left-diagonal
+            return True
+        
+        return False
+
     def draw_line(self, screen, cell1, cell2):
         '''
         Draws a line from cell1 to cell2 on pygame screen
@@ -99,6 +118,43 @@ class Board:
         dx = s_w // self.size
         dy = s_h // self.size
 
-        point1 = dx * cell1[1] + dx//2, dy * cell1[0] + dy//2 
-        point2 = dx * cell2[1] + dx//2, dy * cell2[0] + dy//2
-        pygame.draw.line(screen, (255, 255, 255), point1, point2, 5)
+        if Board._adjacent_cells(cell1, cell2):
+            point1 = dx * cell1[1] + dx//2, dy * cell1[0] + dy//2 
+            point2 = dx * cell2[1] + dx//2, dy * cell2[0] + dy//2
+            pygame.draw.line(screen, (255, 255, 255), point1, point2, 5)
+        else:
+            if (cell1 == (0, 0) and cell2 == (self.size-1, self.size-1)) or (cell2 == (0, 0) and cell1 == (self.size-1, self.size-1)):     # right-diagonal edges
+                pygame.draw.line(screen, (255, 255, 255), (s_w - dx//2, s_h - dy//2), (s_w, s_h), 5)
+                pygame.draw.line(screen, (255, 255, 255), (0, 0), (dx//2, dy//2), 5)
+            
+            elif (cell1 == (self.size-1, 0) and cell2 == (0, self.size-1)) or (cell2 == (self.size-1, 0) and cell1 == (0, self.size-1)):   # left-diagonal edges
+                pygame.draw.line(screen, (255, 255, 255), (dx//2, s_h - dy//2), (0, s_h), 5)
+                pygame.draw.line(screen, (255, 255, 255), (s_w, 0), (s_w - dx//2, dy//2), 5)
+
+            elif cell1[0] == cell2[0] and (cell1[1], cell2[1]) == (0, self.size-1):   # row edges
+                point1 = dx * cell1[1] + dx//2, dy * cell1[0] + dy//2 
+                pygame.draw.line(screen, (255, 255, 255), (0, point1[1]), point1, 5)
+                
+                point2 = dx * cell2[1] + dx//2, dy * cell2[0] + dy//2
+                pygame.draw.line(screen, (255, 255, 255), point2, (s_w, point2[1]), 5)
+
+            elif cell1[0] == cell2[0] and (cell2[1], cell1[1]) == (0, self.size-1):   # row edges
+                point1 = dx * cell2[1] + dx//2, dy * cell2[0] + dy//2 
+                pygame.draw.line(screen, (255, 255, 255), (0, point1[1]), point1, 5)
+                
+                point2 = dx * cell1[1] + dx//2, dy * cell1[0] + dy//2
+                pygame.draw.line(screen, (255, 255, 255), point2, (s_w, point2[1]), 5)
+
+            elif cell1[1] == cell2[1] and (cell1[0], cell2[0]) == (0, self.size-1):   # column edges
+                point1 = dx * cell1[1] + dx//2, dy * cell1[0] + dy//2 
+                pygame.draw.line(screen, (255, 255, 255), (point1[0], 0), point1, 5)
+                
+                point2 = dx * cell2[1] + dx//2, dy * cell2[0] + dy//2
+                pygame.draw.line(screen, (255, 255, 255), point2, (point2[0], s_h), 5)
+
+            elif cell1[1] == cell2[1] and (cell2[0], cell1[0]) == (0, self.size-1):   # column edges
+                point1 = dx * cell2[1] + dx//2, dy * cell2[0] + dy//2 
+                pygame.draw.line(screen, (255, 255, 255), (point1[0], 0), point1, 5)
+                
+                point2 = dx * cell1[1] + dx//2, dy * cell1[0] + dy//2 
+                pygame.draw.line(screen, (255, 255, 255), point2, (point2[0], s_h), 5)
