@@ -1,4 +1,3 @@
-from numpy import tri
 import pygame
 pygame.init()
 
