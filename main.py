@@ -136,12 +136,6 @@ def get_ai_move(board):
                     best_move = i, j
     return best_move
 
-def get_ai_move_test(board):
-    for i in range(len(board)):
-        for j in range(len(board)):
-            if board[i][j] == ' ':
-                return i, j
-
 # Draw initaial board
 board.draw(screen, checked_winners, colors)
 pygame.display.update()
@@ -171,7 +165,7 @@ while True:
                 
                 # AI's move
                 player = (player + 1) % 2
-                cell = get_ai_move_test(board.board)
+                cell = get_ai_move(board.board)
 
                 board.update(i=cell[0], j=cell[1], player=player)
                 check_winner()
