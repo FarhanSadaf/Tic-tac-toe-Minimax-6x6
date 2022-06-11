@@ -2,8 +2,8 @@
 
 ### Rules
 1. Human is 'O' and AI is 'X', played on 6x6 board.
-2. Player marking 3 of his own signs (X or O) in a row (up, down or diganonally) gets a point.
-3. The game is ended when there's no more cells left to make move.
+2. Player marking 3 of his own signs (X or O) in a row (up, down or diganonally), gets a point.
+3. The game is ended when there's no more cell left to make a move.
 4. The player with highest point wins the round.
 
 ### Requirements
