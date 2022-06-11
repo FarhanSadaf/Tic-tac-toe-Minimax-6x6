@@ -14,44 +14,79 @@ playersigns = {
     0: 'O',     # Human 
     1: 'X'      # AI
 }
+
+playerscores = {
+    0: 0,
+    1: 0
+}
+
 board = Board(playersigns=playersigns)
+checked_winners = [[False for _ in range(board.size)] for _ in range(board.size)]
 
 def game_over():
     '''
     Checks if there's a winner or all cells of board are filled: True
     Otherwise: False
     '''
-    global board, player, playersigns
-    winner, cells = Board.check_winner(board.board, playersigns)
-    if winner != None:
-        print(f'\nPlayer {winner} ({playersigns[winner]}) wins!\n')
-        board.draw_line(screen, cells[0], cells[1])
-        board.draw_line(screen, cells[1], cells[2])
-        board.draw(screen)
-        pygame.display.update()
+    global player, playerscores
+    if Board.all_filled(board.board):
+        print('\nFinal score :')
+        print(f'Player {playerscores[0]}')
+        print(f'AI {playerscores[1]}', end='\n\n')
+
+        if playerscores[0] == playerscores[1]:
+            print('\nDraw!')
+        elif playerscores[0] > playerscores[1]:
+            print('\nPlayer won!')
+        else:
+            print('\nAI won!')
+
         pygame.time.delay(2000)
         board.clear()
+        board.draw_board(screen)
+        pygame.display.update()
+        
+        player = 0
+        playerscores = {
+            0: 0,
+            1: 0
+        }
         return True
 
-    if Board.all_filled(board.board):
-        print('\nDraw\n')
-        board.clear()
-        return True
-    
-    player = (player + 1) % 2
     return False
 
+
+def check_winner():
+    global board, winner_checked, playersigns, playerscores
+    line_color = {
+        0: (255, 255, 255),
+        1: (255, 99, 71)
+    }
+    winner, cells = Board.check_winner(board.board, checked_winners, playersigns)
+    if winner != None:
+        playerscores[winner] += 1
+
+        print(f'Player {playerscores[0]}')
+        print(f'AI {playerscores[1]}', end='\n\n')
+        
+        board.draw_line(screen, cells[0], cells[1], line_color[winner])
+        board.draw_line(screen, cells[1], cells[2], line_color[winner])
+        
+        for i, j in cells:
+            checked_winners[i][j] = True
+            
+        pygame.display.update()
 
 def minimax(board, depth, alpha, beta, maximizing_player):
     '''
     maximizing player: AI
     '''
-    global playersigns
+    global playersigns, checked_winners
     scores = {
         0: -1,      # Human
         1: +1       #AI
     }
-    winner, _ =  Board.check_winner(board, playersigns)
+    winner, _ =  Board.check_winner(board, checked_winners, playersigns)
     if winner != None:
         return scores[winner]
     elif Board.all_filled(board) or depth == 0:
@@ -98,6 +133,9 @@ def get_ai_move(board):
                     best_move = i, j
     return best_move
 
+# Draw initaial board
+board.draw_board(screen)
+pygame.display.update()
 
 while True:
     # Set refresh rate
@@ -109,22 +147,29 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
 
-        if event.type == pygame.MOUSEBUTTONDOWN: 
+        if event.type == pygame.MOUSEBUTTONDOWN:
             pos = pygame.mouse.get_pos()
             
-            # Human's move
+            # Player's move
             if board.update(i=pos[1] // (WIDTH // board.size), j=pos[0] // (HEIGHT // board.size), player=player):
+                check_winner()
+
+                board.draw_moves(screen)
+                pygame.display.update()
+                
                 if game_over():
                     continue
                 
                 # AI's move
+                player = (player + 1) % 2
                 cell = get_ai_move(board.board)
+
                 board.update(i=cell[0], j=cell[1], player=player)
+                check_winner()
 
-                if game_over():
-                    player = (player + 1) % 2
-
-    # Main drawing stuffs.
-    screen.fill((51, 51, 51))
-    board.draw(screen)
-    pygame.display.update()
+                board.draw_moves(screen)
+                pygame.display.update()
+                
+                # Player's move
+                player = (player + 1) % 2
+                game_over()
