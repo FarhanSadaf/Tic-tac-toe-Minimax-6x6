@@ -1,4 +1,4 @@
-# 6x6 Tic-Tac-Toe AI using Minimax algorithm
+# 6x6 Tic-Tac-Toe AI using Minimax Algorithm and Alpha-Beta Pruning
 
 ### Rules
 1. Human is 'O' and AI is 'X', played on 6x6 board.
