@@ -113,7 +113,7 @@ while True:
             pos = pygame.mouse.get_pos()
             
             # Human's move
-            if board.update(i=pos[1] // (HEIGHT // board.size), j=pos[0] // (HEIGHT // board.size), player=player):
+            if board.update(i=pos[1] // (WIDTH // board.size), j=pos[0] // (HEIGHT // board.size), player=player):
                 if game_over():
                     continue
                 
