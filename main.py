@@ -20,6 +20,11 @@ playerscores = {
     1: 0
 }
 
+colors = {
+    0: (255, 255, 255),
+    1: (255, 99, 71)
+}
+
 board = Board(playersigns=playersigns)
 checked_winners = [[False for _ in range(board.size)] for _ in range(board.size)]
 
@@ -28,7 +33,7 @@ def game_over():
     Checks if there's a winner or all cells of board are filled: True
     Otherwise: False
     '''
-    global player, playerscores
+    global player, playerscores, checked_winners, colors
     if Board.all_filled(board.board):
         print('\nFinal score :')
         print(f'Player {playerscores[0]}')
@@ -43,7 +48,7 @@ def game_over():
 
         pygame.time.delay(2000)
         board.clear()
-        board.draw_board(screen)
+        board.draw(screen, checked_winners, colors)
         pygame.display.update()
         
         player = 0
@@ -51,17 +56,14 @@ def game_over():
             0: 0,
             1: 0
         }
+        checked_winners = [[False for _ in range(board.size)] for _ in range(board.size)]
         return True
 
     return False
 
 
 def check_winner():
-    global board, winner_checked, playersigns, playerscores
-    line_color = {
-        0: (255, 255, 255),
-        1: (255, 99, 71)
-    }
+    global board, winner_checked, playersigns, playerscores, colors
     winner, cells = Board.check_winner(board.board, checked_winners, playersigns)
     if winner != None:
         playerscores[winner] += 1
@@ -69,13 +71,14 @@ def check_winner():
         print(f'Player {playerscores[0]}')
         print(f'AI {playerscores[1]}', end='\n\n')
         
-        board.draw_line(screen, cells[0], cells[1], line_color[winner])
-        board.draw_line(screen, cells[1], cells[2], line_color[winner])
-        
+        board.draw(screen, checked_winners, colors)
+        board.draw_line(screen, cells[0], cells[1], colors[winner])
+        board.draw_line(screen, cells[1], cells[2], colors[winner])
+        pygame.display.update()
+        pygame.time.delay(1000)
+
         for i, j in cells:
             checked_winners[i][j] = True
-            
-        pygame.display.update()
 
 def minimax(board, depth, alpha, beta, maximizing_player):
     '''
@@ -133,8 +136,14 @@ def get_ai_move(board):
                     best_move = i, j
     return best_move
 
+def get_ai_move_test(board):
+    for i in range(len(board)):
+        for j in range(len(board)):
+            if board[i][j] == ' ':
+                return i, j
+
 # Draw initaial board
-board.draw_board(screen)
+board.draw(screen, checked_winners, colors)
 pygame.display.update()
 
 while True:
@@ -154,7 +163,7 @@ while True:
             if board.update(i=pos[1] // (WIDTH // board.size), j=pos[0] // (HEIGHT // board.size), player=player):
                 check_winner()
 
-                board.draw_moves(screen)
+                board.draw(screen, checked_winners, colors)
                 pygame.display.update()
                 
                 if game_over():
@@ -162,12 +171,12 @@ while True:
                 
                 # AI's move
                 player = (player + 1) % 2
-                cell = get_ai_move(board.board)
+                cell = get_ai_move_test(board.board)
 
                 board.update(i=cell[0], j=cell[1], player=player)
                 check_winner()
 
-                board.draw_moves(screen)
+                board.draw(screen, checked_winners, colors)
                 pygame.display.update()
                 
                 # Player's move
