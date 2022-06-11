@@ -176,3 +176,5 @@ while True:
                 # Player's move
                 player = (player + 1) % 2
                 game_over()
+
+    pygame.display.update()
